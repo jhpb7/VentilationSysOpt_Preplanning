@@ -1,0 +1,95 @@
+ansatz:
+  ansatz: radial
+  cost:
+    o1:
+      ansatz_func:
+        - gamma[0]*d
+        - gamma[1]
+      ansatz_param:
+        1: 2500
+        2: 600
+      order: 1
+      unit: Euro
+  power:
+    o3:
+      ansatz_func:
+        - beta[0]*q**3/d**4
+        - beta[1]*q**2*n/d
+        - beta[2]*q*n**2*d**2
+        - beta[3]*n**3*d**5
+        - beta[4]
+      ansatz_param:
+        1: -0.122
+        2: 0.848
+        3: 0.627
+        4: 22.87
+        5: 0.002
+      order: 3
+      unit: W
+  pressure:
+    o2:
+      ansatz_func:
+        - alpha[0]*q**2/d**4
+        - alpha[1]*q*n/d
+        - alpha[2]*n**2*d**2
+      ansatz_param:
+        1: -0.0823
+        2: 0.16911
+        3: 3.91311
+      order: 2
+      unit: Pa
+    o3:
+      ansatz_func:
+        - alpha[0]*q**3/n/d**7
+        - alpha[1]*q**2/d**4
+        - alpha[2]*q*n/d
+        - alpha[3]*n**2*d**2
+      ansatz_param:
+        1: -0.01
+        2: 0.09
+        3: -0.36
+        4: 4.21
+      order: 3
+      unit: Pa
+  rotational_speed:
+    o1:
+      ansatz_func: n(d) = a1*d + a2. where [x] = m and [d] = 1/m
+      ansatz_param:
+        1: -7787
+        2: 6804
+      comment:
+        the fit is sometimes useful to know the maximum speed of the fan. e.g.
+        in acoustics for obtaining the Strouhal-number
+      order: 1
+      unit: 1/min
+fantype: radial
+limits:
+  diameter:
+    comment: None
+    max: 0.5
+    min: 0.3
+    unit: m
+  power:
+    comment: None
+    max: 1
+    max_dim: 30131.85
+    min: 0
+    unit: W
+  pressure:
+    comment: None
+    max: 1
+    max_dim: 5622.7
+    min: 0
+    unit: Pa
+  rotational_speed:
+    comment: approximated no minimum
+    max: 1
+    min: 0
+    unit: 1
+  volume_flow:
+    comment: None
+    max: 1
+    max_dim: 8.33
+    min: 0
+    unit: m^3/s
+modelname: Fan1
