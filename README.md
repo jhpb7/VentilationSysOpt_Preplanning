@@ -4,9 +4,9 @@ Code utilised for publication "*...*", Breuer et al.
 This framework allows optimisation of ventilation systems with respect to duct sizing, fan selection/placement/operation, and volume flow controller placement/operation.  
 
 Variations in control strategies, duct constraints (min/max dimensions, max velocity), and fan data can be explored with the following packages:  
-- **underestimating-hyperplanes** → approximations of fan characteristic curves and duct pressure losses  
-- **vensys-clustering** → ventilation system scenario reduction (load cases + frequencies)  
-- **pyomo2h5** → reading/writing `ruamel.yaml` and `hdf5` files  
+- **underestimating-hyperplanes** --> approximations of fan characteristic curves and duct pressure losses  
+- **vensys-clustering** --> ventilation system scenario reduction (load cases + frequencies)  
+- **pyomo2h5** --> reading/writing `yaml` and `hdf5` files  
 
 ---
 
@@ -150,15 +150,21 @@ flowchart TD
 
 
 ## Preprocess input data
+```
 python -m src.preplanning.preprocessing.create_fan_data.py
 python -m src.preplanning.preprocessing.create_duct_data.py
 python -m src.preplanning.preprocessing.create_network_data.py
 python -m src.preplanning.preprocessing.create_scenario_data.py
+```
 
 ## Merge into single model input
+```
 python -m src.preplanning.preprocessing.merge_all_data.py
+```
 
 ## Run optimisation
+```
 python -m src.preplanning.optimise.optimise_single.py
+```
 
 Results will be written to an hdf5-file (e.g. results.hdf5) and can be analysed with the provided postprocessing jupyter-Notebooks.
