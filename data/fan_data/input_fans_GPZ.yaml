@@ -1,7 +1,0 @@
-Fan_product_lines:
-  Fan1:
-    d: [0.3, 0.5]
-  Fan2:
-    d: [0.2, 0.4]
-  Fan3:
-    d: [0.6]

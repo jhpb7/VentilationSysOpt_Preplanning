@@ -1,4 +1,7 @@
-# the format of this yml file is Edges with fan stations on them. And then per edge you define which fan station is there and how many fans of this kind can be purchased.
+# This file defines the network edges with associated fan stations.
+# For each edge:
+#   - Specify which fan station is located on that edge
+#   - Define how many fans of this type can be purchased (by the number behind the fan and in total in the fan station)
 
 edges:
   [0~1, '0~2']: &central

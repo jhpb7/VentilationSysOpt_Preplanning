@@ -2,12 +2,12 @@ import logging
 import pyomo.environ as pyo
 from pyomo2h5 import load_yaml, ConstraintTracker
 from src.preplanning.optimise import adjust_opt_problem, optimal_preplanning
-from utils.optimisation import run_initial_solve
+from src.preplanning.optimise.utils import run_initial_solve
 
 
 INFILE = "opt_problems/preplanning/GPZ/standard_case.yml"
 OUTFOLDER = "new_solutions/real_GPZ/preplanning/"
-CONTROL_STRATEGY = "distributed"
+CONTROL_STRATEGY = "ODS-CC"
 MAX_VELOCITY = 5
 MAX_HEIGHT = None
 
@@ -36,7 +36,7 @@ def main():
     instance = adjust_opt_problem.adjust_to_control_strategy(
         CONTROL_STRATEGY, model=model, data=data
     )
-    instance = adjust_opt_problem.adjust_to_duct_constraints(
+    instance = adjust_opt_problem.adjust_to_duct_constraint(
         instance, MAX_VELOCITY, MAX_HEIGHT
     )
 

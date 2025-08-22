@@ -1,20 +1,38 @@
+## this script automatically computes the pareto front for a control strategy. therefore, give the stepsize it should use when bounding the energy and invest costs.
+
 import logging
+import numpy as np
 import pyomo.environ as pyo
 from pyomo2h5 import load_yaml, ConstraintTracker
 from src.preplanning.optimise import adjust_opt_problem, optimal_preplanning
-from utils import run_initial_solve, run_pareto_loop
+from src.preplanning.optimise.utils import run_initial_solve, run_pareto_loop
 
 
-INFILE = "opt_problems/preplanning/GPZ/standard_case.yml"
-OUTFOLDER = "new_solutions/real_GPZ/preplanning/"
-CONTROL_STRATEGY = "distributed"
-MAX_VELOCITY = 5
-MAX_HEIGHT = None
+INFILE = "standard_case.yml"
+OUTFOLDER = "results/"
+CONTROL_STRATEGY = "VAV-VPC"
+STEPSIZE_ENERGY = 500
+STEPSIZE_INVEST = 1e3
+
+
+MAX_VELOCITY = 5  # default is 5 m/s
+MAX_HEIGHT = None  # default is None (keeps limits, will force height = width)
+VERTICAL_DUCTS = [  # only needed when max_height is not None
+    ("0~3", "0~4"),
+    ("0~4", "2~1"),
+    ("0~4", "1~1"),
+    ("2~2", "2~3"),
+    ("1~2", "1~3"),
+]
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
+
+
+# stop Pyomo from forwarding solver chatter to your root logger
+logging.getLogger("gurobipy").propagate = False
 
 
 def main():
@@ -36,11 +54,15 @@ def main():
     instance = adjust_opt_problem.adjust_to_control_strategy(
         CONTROL_STRATEGY, model=model, data=data
     )
-    instance = adjust_opt_problem.adjust_to_duct_constraints(
-        instance, MAX_VELOCITY, MAX_HEIGHT
+    instance = adjust_opt_problem.adjust_to_duct_constraint(
+        instance, MAX_VELOCITY, MAX_HEIGHT, VERTICAL_DUCTS
     )
 
     outfolder = OUTFOLDER + CONTROL_STRATEGY + "/"
+
+    # max_load_case defines which load case is removed for postprocessing
+    # -- this is necessary as the maximum load case could just barely become infeasible
+    # when the system is laid out for slightly lower pressure losses.
     max_load_case = None if CONTROL_STRATEGY in ["cav", "central CPC"] else 6
 
     solver = pyo.SolverFactory("gurobi", solver_io="python")
@@ -51,16 +73,14 @@ def main():
         return  # infeasible, nothing more to do
 
     # Pareto front setup
-    stepsize_energy = 500
-    stepsize_invest = 1e3
     energy_cost_pareto = (
-        np.floor(instance.fan_energy_costs.expr() / stepsize_energy) * stepsize_energy
+        np.floor(instance.fan_energy_costs.expr() / STEPSIZE_ENERGY) * STEPSIZE_ENERGY
     )
     invest_cost_pareto = (
-        np.floor(instance.total_invest_costs.expr() / stepsize_invest) * stepsize_invest
+        np.floor(instance.total_invest_costs.expr() / STEPSIZE_INVEST) * STEPSIZE_INVEST
     )
 
-    logging.info("Calculating Pareto-Front...")
+    logging.info("Calculating energy bounded part of the Pareto-Front...")
 
     # minimize investment costs
     instance.obj.deactivate()
@@ -75,7 +95,7 @@ def main():
         solver,
         bound_expr=lambda m: m.fan_energy_costs,
         bound_start=energy_cost_pareto,
-        stepsize=stepsize_energy,
+        stepsize=STEPSIZE_ENERGY,
         bound_name="energy costs",
         control_strategy=CONTROL_STRATEGY,
         comment=comment,
@@ -83,6 +103,7 @@ def main():
         max_load_case=max_load_case,
     )
 
+    logging.info("Calculating invest bounded part of the Pareto-Front...")
     # minimize energy costs
     instance.min_invest_costs.deactivate()
 
@@ -96,7 +117,7 @@ def main():
         solver,
         bound_expr=lambda m: m.total_invest_costs,
         bound_start=invest_cost_pareto,
-        stepsize=stepsize_invest,
+        stepsize=STEPSIZE_INVEST,
         bound_name="invest costs",
         control_strategy=CONTROL_STRATEGY,
         comment=comment,

@@ -17,17 +17,17 @@ from src.preplanning.preprocessing.domain_utils import (
 
 
 def main():
-    OUT_FOLDER = "opt_problems/preplanning/GPZ/"
-    OUT_FILENAME = "standard_case"
+    OUT_FOLDER = "merged_data/"
+    OUT_FILENAME = "data1"
 
-    NETWORK_DATA_FILE = "data/network_data/GPZ.yml"
+    NETWORK_DATA_FILE = "data/network_data/network.yml"
     DUCT_DATA_FILE = "data/duct_data/duct_hyperplanes.yml"
-    FAN_DATA_FILE = "data/fan_data/fan_power_loss_hyperplanes_GPZ.yml"
-    FANS_ON_EDGES_FILE = "data/network_data/fans_on_edges_GPZ.yml"
+    FAN_DATA_FILE = "data/fan_data/fan_power_loss_hyperplanes.yml"
+    FANS_ON_EDGES_FILE = "data/network_data/fans_on_edges.yml"
 
     data = load_yaml(NETWORK_DATA_FILE)
 
-    scenario_data_file = "data/load_case_data/processed_GPZ_load_cases.yml"
+    scenario_data_file = "data/load_case_data/processed_load_cases.yml"
     load_case_data = load_yaml(scenario_data_file)
 
     fans_on_edges = load_yaml(FANS_ON_EDGES_FILE)

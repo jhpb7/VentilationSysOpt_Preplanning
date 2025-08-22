@@ -98,7 +98,7 @@ def main():
     OUTFOLDER = "data/fan_data/"
     INFOLDER = "data/"
 
-    fans_on_edges = load_yaml(INFOLDER + "network_data/fans_on_edges_raw_all_fans.yml")
+    fans_on_edges = load_yaml(INFOLDER + "network_data/fans_on_edges.yml")
 
     outfile_path = INFOLDER + "fan_data/fan_power_loss_hyperplanes_all_fans"
     outfile_data = {}

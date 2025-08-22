@@ -24,13 +24,13 @@ logging.basicConfig(
 
 
 def main():
-    OUT_FOLDER = "opt_problems/preplanning/GPZ/"
-    OUT_FILENAME = "standard_case"
+    OUT_FOLDER = "merged_data/"
+    OUT_FILENAME = "data1"
 
-    NETWORK_DATA_FILE = "data/network_data/GPZ.yml"
+    NETWORK_DATA_FILE = "data/network_data/network.yml"
     DUCT_DATA_FILE = "data/duct_data/duct_hyperplanes.yml"
-    FAN_DATA_FILE = "data/fan_data/fan_power_loss_hyperplanes_GPZ.yml"
-    FANS_ON_EDGES_FILE = "data/network_data/fans_on_edges_GPZ.yml"
+    FAN_DATA_FILE = "data/fan_data/fan_power_loss_hyperplanes.yml"
+    FANS_ON_EDGES_FILE = "data/network_data/fans_on_edges.yml"
 
     data = load_yaml(NETWORK_DATA_FILE)
     fan_data = load_yaml(FAN_DATA_FILE)
@@ -40,7 +40,7 @@ def main():
     for n in np.arange(1, 16):
         logging.info(f"Starting computation with {n} load case(s)")
 
-        scenario_data_file = f"data/load_case_data/varying_n_load_cases_GPZ/processed_GPZ_{n}_load_cases.yml"
+        scenario_data_file = f"data/load_case_data/varying_n_load_cases/processed_GPZ_{n}_load_cases.yml"
         load_case_data = load_yaml(scenario_data_file)
 
         data.update(prepare_load_case_yaml(load_case_data))

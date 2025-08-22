@@ -1,5 +1,5 @@
 import pyomo.environ as pyo
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List, Tuple
 import copy
 from src.preplanning.preprocessing.old_utils import (
     find_fan_edge,
@@ -8,28 +8,26 @@ from src.preplanning.preprocessing.old_utils import (
 
 
 def adjust_to_control_strategy(
-    cs: str, 
-    model: pyo.AbstractModel, 
-    data: Dict[str, Any]
+    cs: str, model: pyo.AbstractModel, data: Dict[str, Any]
 ) -> pyo.ConcreteModel:
     """
     Adjusts a Pyomo model instance to reflect a given control strategy.
 
-    Depending on the specified control strategy (`cs`), this function 
-    modifies the input data and/or applies additional constraints 
+    Depending on the specified control strategy (`cs`), this function
+    modifies the input data and/or applies additional constraints
     to the instantiated Pyomo model.
 
     Supported strategies:
-        - ``"distributed"``: Creates the instance directly.
-        - ``"distributed CPC"``: Adds a branch node to `V_ports` or `V_in`.
-        - ``"distributed VPC"``: Fixes leaf component decision to 1 and 
+        - ``"ODS-CC"``: Creates the instance directly.
+        - ``"DF-CPC"``: Adds a branch node to `V_ports` or `V_in`.
+        - ``"DF-VPC"``: Fixes leaf component decision to 1 and
           forces purchase of the central fan.
-        - ``"fully distributed"``: Fixes leaf component decision to 1 and 
+        - ``"ONLY-DF"``: Fixes leaf component decision to 1 and
           forces neglect of non-leaf central fans.
-        - ``"central"``: Forces central fan purchase decision.
-        - ``"central CPC"``: Same as ``"central"``, but also constrains 
+        - ``"VAV-VPC"``: Forces central fan purchase decision.
+        - ``"VAV-CPC"``: Same as ``"central"``, but also constrains
           scenario pre-pressures to remain equal.
-        - ``"cav"``: Collapses all scenarios to a single one and adjusts 
+        - ``"CAV"``: Collapses all scenarios to a single one and adjusts
           fan hyperplane sets accordingly.
 
     Args:
@@ -38,7 +36,7 @@ def adjust_to_control_strategy(
         model (pyo.AbstractModel):
             A Pyomo abstract model used as a template.
         data (Dict[str, Any]):
-            Model input data in dictionary format, structured as required by 
+            Model input data in dictionary format, structured as required by
             ``model.create_instance``.
 
     Returns:
@@ -55,10 +53,10 @@ def adjust_to_control_strategy(
         return m.ind_purchase[i, j] == int((i, j) == central_fan_edge)
 
     match cs:
-        case "distributed":
+        case "ODS-CC":
             instance = model.create_instance({None: data})
 
-        case "distributed CPC":
+        case "DF-CPC":
             branch_node = find_branch_node(data["E"][None])
             if "V_ports" in data:
                 data["V_ports"][None].append(branch_node)
@@ -68,7 +66,7 @@ def adjust_to_control_strategy(
                 raise KeyError("Can't add prepressure node.")
             instance = model.create_instance({None: data})
 
-        case "distributed VPC":
+        case "DF-VPC":
             instance = model.create_instance({None: data})
             instance.leaf_component_decision.value = 1
             instance.leaf_component_decision.fixed = True
@@ -79,24 +77,24 @@ def adjust_to_control_strategy(
                     return m.ind_purchase[i, j] == 1
                 return pyo.Constraint.Skip
 
-        case "fully distributed":
+        case "ONLY-DF":
             instance = model.create_instance({None: data})
             instance.leaf_component_decision.value = 1
             instance.leaf_component_decision.fixed = True
 
             @instance.Constraint(instance.E_fan_station)
             def force_neglect_central(m, i, j):
-                return (
-                    m.ind_purchase[i, j] == int((i, j) in instance.E_fan_station_leaf)
+                return m.ind_purchase[i, j] == int(
+                    (i, j) in instance.E_fan_station_leaf
                 )
 
-        case "central" | "central CPC":
+        case "VAV-VPC" | "VAV-CPC":
             instance = model.create_instance({None: data})
             instance.make_central = pyo.Constraint(
                 instance.E_fan_station, rule=make_central
             )
 
-            if cs == "central CPC":
+            if cs == "VAV-CPC":
 
                 @instance.Constraint(instance.Scenarios)
                 def const_prepressure(m, s):
@@ -108,7 +106,7 @@ def adjust_to_control_strategy(
                         )
                     return pyo.Constraint.Skip
 
-        case "cav":
+        case "CAV":
             n_scen = data["Scenarios"][None][-1]
             # collapse scenarios to 1
             data["scenario"][1] = copy.deepcopy(data["scenario"][n_scen])
@@ -137,11 +135,11 @@ def adjust_to_control_strategy(
     return instance
 
 
-
 def adjust_to_duct_constraint(
     instance: pyo.ConcreteModel,
     max_velocity: Optional[float],
-    max_height: Optional[float]
+    max_height: Optional[float],
+    vertical_ducts: Optional[List[Tuple]] = None,
 ) -> pyo.ConcreteModel:
     """
     Adjusts a Pyomo model instance by applying duct-related constraints.
@@ -149,25 +147,27 @@ def adjust_to_duct_constraint(
     This function modifies the given Pyomo model (`instance`) by:
       - Setting maximum velocity values for all ducts in `instance.E_duct`
         if `max_velocity` is provided.
-      - Adding a constraint to enforce duct width equal to duct height 
+      - Adding a constraint to enforce duct width equal to duct height
         if `max_height` is not provided.
       - Otherwise, adding a constraint to limit duct height to `max_height`
         for all ducts except those in `instance.E_duct_vertical` and a few
         explicitly skipped duct edges.
 
     Args:
-        instance (pyo.ConcreteModel): 
+        instance (pyo.ConcreteModel):
             A Pyomo model instance with sets `E_duct` and `E_duct_vertical`,
             and variables `duct_width` and `duct_height`.
-        max_velocity (Optional[float]): 
+        max_velocity (Optional[float]):
             The maximum velocity to assign to all ducts. If None, no velocity
             constraint is applied.
-        max_height (Optional[float]): 
-            The maximum duct height. If None, width is constrained to equal 
+        max_height (Optional[float]):
+            The maximum duct height. If None, width is constrained to equal
             height instead.
+        vertical_ducts (Optional[list(Tuple)]:
+            list of tuples representing horizontal duct edges. Only used, if max_height is not None.
 
     Returns:
-        pyo.ConcreteModel: 
+        pyo.ConcreteModel:
             The modified Pyomo model with the applied constraints.
     """
     if max_velocity is not None:
@@ -179,17 +179,13 @@ def adjust_to_duct_constraint(
         @instance.Constraint(instance.E_duct)
         def width_equals_height(m, i, j):
             return m.duct_width[i, j] == m.duct_height[i, j]
+
     else:
 
         @instance.Constraint(instance.E_duct - instance.E_duct_vertical)
         def limit_height(m, i, j):
-            if (i, j) in [
-                ("0~3", "0~4"),
-                ("0~4", "2~1"),
-                ("0~4", "1~1"),
-                ("2~2", "2~3"),
-                ("1~2", "1~3"),
-            ]:
+            if (i, j) in vertical_ducts:
                 return pyo.Constraint.Skip
             return m.duct_height[i, j] <= max_height
+
     return instance

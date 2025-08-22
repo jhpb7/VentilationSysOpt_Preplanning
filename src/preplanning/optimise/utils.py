@@ -12,8 +12,7 @@ def run_initial_solve(
     """Run the initial solve and save results or IIS if infeasible."""
     filename = str(uuid.uuid4())
     solver.options["LogFile"] = outfolder + filename + ".log"
-    logging.info("Running initial solve...")
-
+    logging.info("Running initial solve. Logging into filename %s", filename)
     results = solver.solve(instance, tee=True, warmstart=False)
     with PyomoHDF5Saver(outfolder + filename) as saver:
         if results.solver.termination_condition in [

@@ -1,42 +1,153 @@
 # VentilationSysOpt_Preplanning
 
-Code utilised for publication "", Breuer et al.
-The code can be used to optimise ventilation systems by duct sizing, fan selection, placement and operation as well as volume flow controller placement and operation.
-Further, variations in control strategy, duct constrarints (maximal/minimal dimensions, maximal velocity) and fan data can be performed with the framework by utilising three packages:
-- underestimating-hyperplanes (used for approximations of fan characteristic curves and duct pressure losses)
-- vensys-clustering used for ventilation system scenario reduction, yielding load cases and their frequencies
-- pyomo2h5 (used for working with ruamel.yaml and hdf5 files)
+Code utilised for publication "*...*", Breuer et al.  
+This framework allows optimisation of ventilation systems with respect to duct sizing, fan selection/placement/operation, and volume flow controller placement/operation.  
 
-## Features
+Variations in control strategies, duct constraints (min/max dimensions, max velocity), and fan data can be explored with the following packages:  
+- **underestimating-hyperplanes** → approximations of fan characteristic curves and duct pressure losses  
+- **vensys-clustering** → ventilation system scenario reduction (load cases + frequencies)  
+- **pyomo2h5** → reading/writing `ruamel.yaml` and `hdf5` files  
 
+---
 
-### Input
-- fan data
-- network data
-- load case data (volume flow demand in rooms)
+## Overview
+The repository provides:
+- **Input definitions** (YAML files for fans, ducts, network, and load cases)  
+- **Preprocessing scripts** to convert input data into model-ready format  
+- **Optimisation model** formulated in Pyomo and solved with Gurobi (or other solvers with minor adaptations)  
+- **Postprocessing tools** to analyse Pareto fronts, strategy variations, and duct constraints  
 
-### Preprocess input
-- fan characteristic curve approximation (using code from xy)
-- duct pressure loss approximation (using code from xy)
-- load case reduction (using code from xy)
-- network data
+---
 
-### Optimisation
-- contains the full optimisation problem from Breuer et al. modelled in Pyomo
-- optimise code by merging all input data and instantiating an optimisation problem
-- solving uses Gurobi (can be changed with minor adaptions)
-- solve Pareto Front
-- vary control strategy
-- solve with duct constraints, e.g. variations in duct height/width
-- postprocess results to create (i) Pareto Fronts, (ii) ...
+## Input
+You can optimise your own building by preparing the following YAML files:
+- `fan_data.yml` → fan performance data (e.g. pressure vs. flow curve, efficiency curve)  
+- `duct_data.yml` → duct types and constraints (min/max height/width, max velocity, roughness)  
+- `network_data.yml` → network topology (nodes, ducts, connections, rooms)  
+- `load_case_data.yml` → demand scenarios (volume flow demands in rooms)  
 
-## Examples
+---
 
-An example workflow is as follows:
+## Preprocessing
+
+Each script prepares part of the input data into a unified format for the optimiser.
+
+- **`create_fan_data.py`**  
+  Reads `fan data.yml`, approximates fan characteristic curves (using *underestimating-hyperplanes*), and creates model-ready fan input.  
+
+- **`create_duct_data.py`**  
+  Reads `duct data.yml`, approximates duct pressure losses (using *underestimating-hyperplanes*), and converts duct info into model format.  
+
+- **`create_network_data.py`**  
+  Reads `network data.yml` (topology of ducts, junctions, rooms) and prepares the system structure.  
+
+- **`create_scenario_data.py`**  
+  Reads `load case data.yml`, applies scenario reduction (using *vensys-clustering*), and generates a reduced set of load cases with probabilities.  
+
+- **`merge_all_data.py`**  
+  Merges all preprocessed inputs into a single model input file, e.g. `data1.yml`.  
+
+---
+
+## Optimisation
+
+- **`optimal_preplanning.py`**  
+  Defines the Pyomo optimisation model from Breuer et al. (duct sizing, fan placement, control strategy).  
+
+- **`optimise_single.py`**  
+  Instantiates the model with a given dataset (e.g. `data1.yml`) and solves it.  
+  By default uses **Gurobi**, but can be adapted for other solvers.  
+
+Outputs include:
+- `results.hdf5` → all decision variables, constraints, and KPIs  
+- Pareto fronts for conflicting objectives  
+- Variations with different control strategies and duct constraints  
+
+---
+
+## Postprocessing
+Postprocessing scripts allow analysis of optimisation results:
+- Analyse influence of the **number of load cases**  
+- Analyse **Pareto fronts** for multiple control strategies  
+- Explore further variations (e.g. duct sizing limits, fan placement strategies)  
+
+---
+
+## Workflow Example
+
+An example end-to-end workflow is illustrated below:
 
 ```mermaid
 flowchart TD
-    A[data.csv] --> B[preprocess.py]
-    B --> C[train.py]
-    C --> D[evaluate.py]
-    D --> E[plot_results.py]
+ subgraph Preprocessing["Preprocessing"]
+        n9["create_fan_data.py"]
+        n5["fan data.yml"]
+        n11["create_duct_data.py"]
+        n6["duct data.yml"]
+        n13["create_network_data.py"]
+        n7["network data.yml"]
+        n12["create_scenario_data.py"]
+        n8["load case data.yml"]
+        n14["merge_all_data.py"]
+  end
+ subgraph Modeling_and_Optimization["Optimisation"]
+        n17["optimise"]
+        n18["instantiate model (data1.yml)"]
+        n19["optimization in Gurobi"]
+        n20["postprocess"]
+        n21["results1.hdf5"]
+  end
+ subgraph s1["Postprocessing"]
+        n23["analysis of influence of variation of #load cases"]
+        n22["analysis of pareto front for multiple control strategies"]
+        n24["..."]
+  end
+    n5 --> n9
+    n6 --> n11
+    n7 --> n13
+    n8 --> n12
+    n9 --> n14
+    n11 --> n14
+    n13 --> n14
+    n12 --> n14
+    n14 --> n15["data1.yml (model input)"]
+    n15 --> n17
+    n16["optimal_preplanning.py"] --> n17
+    n17 --> n18
+    n18 --> n19
+    n19 --> n20
+    n20 --> n21
+    n21 --> n22 & n23 & n24
+
+    n5@{ shape: tag-doc}
+    n6@{ shape: doc}
+    n7@{ shape: doc}
+    n8@{ shape: doc}
+    n18@{ shape: rounded}
+    n19@{ shape: rounded}
+    n20@{ shape: rounded}
+    n21@{ shape: doc}
+    n15@{ shape: doc}
+    n16@{ shape: doc}
+```
+
+## Example Usage
+
+# Preprocess input data
+python -m src.preplanning.preprocessing.create_fan_data.py
+python -m src.preplanning.preprocessing.create_duct_data.py
+python -m src.preplanning.preprocessing.create_network_data.py
+python -m src.preplanning.preprocessing.create_scenario_data.py
+
+# Merge into single model input
+python -m src.preplanning.preprocessing.merge_all_data.py
+
+# Run optimisation
+python -m src.preplanning.optimise.optimise_single.py
+
+
+Results will be written to results.hdf5 and can be analysed with the provided postprocessing jupyter-Notebooks.
+
+## Note on AI usage
+Parts of this repository (documentation and/or code snippets) were prepared with the assistance of AI-based tools, namely ChatGPT version 4 and 5. All outputs were reviewed, validated, and adapted by the authors.
+

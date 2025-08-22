@@ -25,7 +25,7 @@ def main():
     yaml_path = files(data).joinpath("general.yml")
 
     general_data = load_yaml(yaml_path)
-    building_data = load_yaml("data/load_case_data/raw_GPZ_load_cases.yml")
+    building_data = load_yaml("data/load_case_data/raw_load_cases.yml")
 
     df = compute_required_volume_flows(general_data, building_data, overview_flag=False)
     df = merge_rooms(df, building_data)

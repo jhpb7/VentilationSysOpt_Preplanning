@@ -710,8 +710,7 @@ def model(
             def pressure_loss_duct(m_scen, i, j):
                 return (
                     m_scen.pressure_change[i, j]
-                    == 10
-                    * m_scen.duct_zeta_volume_flow_calc[i, j]
+                    == m_scen.duct_zeta_volume_flow_calc[i, j]
                     * m_scen.volume_flow[i, j] ** 2
                 )
 
@@ -829,7 +828,7 @@ def model(
         def pressure_loss_fix(m_scen, i, j):
             return (
                 m_scen.pressure_change[i, j]
-                == 10 * model.fixed_zeta[i, j] * m_scen.volume_flow[i, j] ** 2
+                == model.fixed_zeta[i, j] * m_scen.volume_flow[i, j] ** 2
             )
 
         @m_scen.Constraint(
