@@ -4,15 +4,9 @@ Code utilised for publication "*...*", Breuer et al.
 This framework allows optimisation of ventilation systems with respect to duct sizing, fan selection/placement/operation, and volume flow controller placement/operation.  
 
 Variations in control strategies, duct constraints (min/max dimensions, max velocity), and fan data can be explored with the following packages:  
-<<<<<<< HEAD
-- **underestimating-hyperplanes** → approximations of fan characteristic curves and duct pressure losses  
-- **vensys-clustering** → ventilation system scenario reduction (load cases + frequencies)  
-- **pyomo2h5** → reading/writing `ruamel.yaml` and `hdf5` files  
-=======
 - **underestimating-hyperplanes** --> approximations of fan characteristic curves and duct pressure losses  
 - **vensys-clustering** --> ventilation system scenario reduction (load cases + frequencies)  
 - **pyomo2h5** --> reading/writing `yaml` and `hdf5` files  
->>>>>>> 4464782897ddb212157530d1b94ab9e8decef5d4
 
 ---
 
@@ -39,21 +33,6 @@ You can optimise your own building by preparing the following YAML files:
 Each script prepares part of the input data into a unified format for the optimiser.
 
 - **`create_fan_data.py`**  
-<<<<<<< HEAD
-  Reads `fan data.yml`, approximates fan characteristic curves (using *underestimating-hyperplanes*), and creates model-ready fan input.  
-
-- **`create_duct_data.py`**  
-  Reads `duct data.yml`, approximates duct pressure losses (using *underestimating-hyperplanes*), and converts duct info into model format.  
-
-- **`create_network_data.py`**  
-  Reads `network data.yml` (topology of ducts, junctions, rooms) and prepares the system structure.  
-
-- **`create_scenario_data.py`**  
-  Reads `load case data.yml`, applies scenario reduction (using *vensys-clustering*), and generates a reduced set of load cases with probabilities.  
-
-- **`merge_all_data.py`**  
-  Merges all preprocessed inputs into a single model input file, e.g. `data1.yml`.  
-=======
   Reads fan files like `Fan1.yml`, approximates fan characteristic curves (using *underestimating-hyperplanes*), and creates model-ready fan input.  
 
 - **`create_duct_data.py`**  
@@ -67,7 +46,6 @@ Each script prepares part of the input data into a unified format for the optimi
 
 - **`merge_all_data.py`**  
   Merges all preprocessed inputs into a single model input file, e.g. `data1.yml`. Besides the above inputs, additionally the `fans_on_edges.yml` is used that describes which fans are located on which edges in the network.  
->>>>>>> 4464782897ddb212157530d1b94ab9e8decef5d4
 
 ---
 
@@ -103,16 +81,6 @@ An example end-to-end workflow is illustrated below:
 flowchart TD
  subgraph Preprocessing["Preprocessing"]
         n9["create_fan_data.py"]
-<<<<<<< HEAD
-        n5["fan data.yml"]
-        n11["create_duct_data.py"]
-        n6["duct data.yml"]
-        n13["create_network_data.py"]
-        n7["network data.yml"]
-        n12["create_scenario_data.py"]
-        n8["load case data.yml"]
-        n14["merge_all_data.py"]
-=======
         n5["Fans *.yml"]
         n11["create_duct_data.py"]
         n6["duct_data.yml"]
@@ -125,7 +93,6 @@ flowchart TD
         n28["network.yml"]
         n27["processed_load_cases.yml"]
         n29["fans_on_edges.yml"]
->>>>>>> 4464782897ddb212157530d1b94ab9e8decef5d4
   end
  subgraph Modeling_and_Optimization["Optimisation"]
         n17["optimise"]
