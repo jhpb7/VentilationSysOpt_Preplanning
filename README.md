@@ -73,7 +73,18 @@ Postprocessing scripts allow analysis of optimisation results:
 
 ---
 
+
+## Reproducing Paper Results
+
+All input files required to reproduce the results from the publication are provided in the `data/` directory.  
+These inputs are preprocessed and merged into a single instantiation file (an example of which can be found here: `merged_data/data1.yml`), which is then used to run the optimisation.  
+
+For reference, an example optimisation output is included under `results/ODS-CC/`.  
+This file was generated with the option `save_constraint_flag=False` in **pyomo2h5** to omit constraint storage and comply with GitHub’s file size limits.
+
+
 ## Workflow Example
+
 
 An example end-to-end workflow is illustrated below:
 

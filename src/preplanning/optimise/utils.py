@@ -33,7 +33,7 @@ def run_initial_solve(
             saver.save_annotated_dict(
                 postprocess(instance, max_load_case=max_load_case), float_precision=4
             )
-            print("got here")
+
             saver.save_tracked_constraints(tracker, "Additional_constraints")
     return True, filename
 
