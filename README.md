@@ -143,20 +143,20 @@ flowchart TD
     n16@{ shape: doc}
 ```
 
-# Example Usage
+## Example Usage
 
 
-## Preprocess input data
+### Preprocess input data
 ```
 python -m src.preplanning.preprocessing.create_fan_data.py
 python -m src.preplanning.preprocessing.create_duct_data.py
 python -m src.preplanning.preprocessing.create_network_data.py
 python -m src.preplanning.preprocessing.create_scenario_data.py
 ```
-# Merge into single model input
+### Merge into single model input
 python -m src.preplanning.preprocessing.merge_all_data.py
 
-# Run optimisation
+### Run optimisation
 python -m src.preplanning.optimise.optimise_single.py
 
 
@@ -167,7 +167,7 @@ Results will be written to an hdf5-file (e.g. results.hdf5) and can be analysed 
 Parts of this repository (documentation and/or code snippets) were prepared with the assistance of AI-based tools, namely ChatGPT version 4 and 5. All outputs were reviewed, validated, and adapted by the authors.
 
 
-# Funding
+## Funding
 The presented results were obtained within the research project ‘‘Algorithmic System Planning of Air Handling Units’’, Project
 No. 22289 N/1, funded by the program for promoting the Industrial Collective Research (IGF) of the German Ministry of Economic
 Affairs and Climate Action (BMWK), approved by the Deutsches Zentrum für Luft- und Raumfahrt (DLR). We want to thank all the
