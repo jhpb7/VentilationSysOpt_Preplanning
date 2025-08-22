@@ -2,11 +2,13 @@
 
 Code utilised for publication "*...*", Breuer et al.  
 This framework allows optimisation of ventilation systems with respect to duct sizing, fan selection/placement/operation, and volume flow controller placement/operation.  
+The framework allows to optimise variations in control strategies, duct_constraints (min/max dimensions, max velocity), and fan data. 
 
-Variations in control strategies, duct constraints (min/max dimensions, max velocity), and fan data can be explored with the following packages:  
+The following packages are necessary (and are therefore part of the supplementary materials of the paper):
 - **underestimating-hyperplanes** --> approximations of fan characteristic curves and duct pressure losses  
-- **vensys-clustering** --> ventilation system scenario reduction (load cases + frequencies)  
-- **pyomo2h5** --> reading/writing `yaml` and `hdf5` files  
+- **vensys-clustering** --> ventilation system scenario reduction (load cases + frequencies)
+
+Additionally, the package **pyomo2h5** is used for reading/writing `yaml` and `hdf5` files  
 
 ---
 
