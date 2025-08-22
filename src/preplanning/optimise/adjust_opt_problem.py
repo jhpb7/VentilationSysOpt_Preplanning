@@ -1,7 +1,7 @@
 import pyomo.environ as pyo
 from typing import Optional, Dict, Any, List, Tuple
 import copy
-from src.preplanning.preprocessing.old_utils import (
+from src.preplanning.preprocessing.general_utils import (
     find_fan_edge,
     find_branch_node,
 )

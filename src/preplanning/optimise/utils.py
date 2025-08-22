@@ -23,7 +23,7 @@ def run_initial_solve(
                 {"Comment": {"Content": comment + ", proven to be infeasible"}}
             )
             calculate_IIS(instance, outfolder + filename + "_")
-            return False
+            return False, filename
         else:
             saver.save_annotated_dict(
                 {"Comment": {"Content": control_strategy + ", min lcc " + comment}}
@@ -33,8 +33,9 @@ def run_initial_solve(
             saver.save_annotated_dict(
                 postprocess(instance, max_load_case=max_load_case), float_precision=4
             )
+            print("got here")
             saver.save_tracked_constraints(tracker, "Additional_constraints")
-    return True
+    return True, filename
 
 
 def run_pareto_loop(

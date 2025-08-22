@@ -1,11 +1,11 @@
 from pyomo2h5 import load_yaml
 from pyomo2h5.yaml_handler import construct_yaml, convert_numpy_to_native
 
-from src.preplanning.preprocessing.propagate_volume_flows import propagate_volume_flows
 from src.preplanning.preprocessing.general_utils import (
     prepare_load_case_yaml,
     get_max_volume_flow_in_problem,
     get_fan_edge_volume_flow,
+    propagate_volume_flows
 )
 
 from src.preplanning.preprocessing.domain_utils import (

@@ -3,7 +3,7 @@ from importlib.resources import files
 import numpy as np
 from pyomo2h5 import load_yaml
 
-from load_case_clustering import (
+from vensys_clustering import (
     data,
     compute_required_volume_flows,
     merge_rooms,

@@ -1,7 +1,7 @@
 # %%
 import logging
 import numpy as np
-from hyperplane_utils import compute_planes_nd, compute_planes_1d, plane_dict_from_array
+from src.preplanning.preprocessing.hyperplane_utils import compute_planes_nd, compute_planes_1d, plane_dict_from_array
 from pyomo2h5.yaml_handler import construct_yaml, convert_numpy_to_native
 
 # Configure logging

@@ -8,7 +8,7 @@ from src.preplanning.optimise import adjust_opt_problem, optimal_preplanning
 from src.preplanning.optimise.utils import run_initial_solve, run_pareto_loop
 
 
-INFILE = "standard_case.yml"
+INFILE = "merged_data/data1.yml"
 OUTFOLDER = "results/"
 CONTROL_STRATEGY = "VAV-VPC"
 STEPSIZE_ENERGY = 500
@@ -24,14 +24,14 @@ VERTICAL_DUCTS = [  # only needed when max_height is not None
     ("2~2", "2~3"),
     ("1~2", "1~3"),
 ]
+MAX_LOAD_CASE_NUMBER = 6 # number of the maximum load case (if existing, else None)
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
-
-# stop Pyomo from forwarding solver chatter to your root logger
+# silence logger of gurobipy
 logging.getLogger("gurobipy").propagate = False
 
 
@@ -63,13 +63,15 @@ def main():
     # max_load_case defines which load case is removed for postprocessing
     # -- this is necessary as the maximum load case could just barely become infeasible
     # when the system is laid out for slightly lower pressure losses.
-    max_load_case = None if CONTROL_STRATEGY in ["cav", "central CPC"] else 6
+    max_load_case = None if CONTROL_STRATEGY in ["CAV", "VAV-VPC"] else MAX_LOAD_CASE_NUMBER
 
     solver = pyo.SolverFactory("gurobi", solver_io="python")
 
-    if not run_initial_solve(
+    success, _ = run_initial_solve(
         instance, solver, tracker, outfolder, CONTROL_STRATEGY, comment, max_load_case
-    ):
+    )
+    
+    if not success:
         return  # infeasible, nothing more to do
 
     # Pareto front setup
