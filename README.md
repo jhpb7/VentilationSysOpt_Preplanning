@@ -12,6 +12,23 @@ Additionally, the package **pyomo2h5** is used for reading/writing `yaml` and `h
 
 ---
 
+## ⚡ Installation
+
+Install locally:
+```
+pip install .
+```
+If you want to directly install from GitHub (without cloning):
+```
+pip install git+https://github.com/<your-username>/pyomo2h5.git
+```
+To install all subpackages (including the above mentioned) use
+```
+pip install -r requirements.txt
+```
+
+---
+
 ## Overview
 The repository provides:
 - **Input definitions** (YAML files for fans, ducts, network, and load cases)  
