@@ -20,7 +20,7 @@ pip install .
 ```
 If you want to directly install from GitHub (without cloning):
 ```
-pip install git+https://github.com/<your-username>/pyomo2h5.git
+pip install git+https://github.com/jhpb7/pyomo2h5.git
 ```
 To install all subpackages (including the above mentioned) use
 ```
