@@ -154,10 +154,10 @@ python -m src.preplanning.preprocessing.create_network_data.py
 python -m src.preplanning.preprocessing.create_scenario_data.py
 ```
 ### Merge into single model input
-python -m src.preplanning.preprocessing.merge_all_data.py
+`python -m src.preplanning.preprocessing.merge_all_data.py`
 
 ### Run optimisation
-python -m src.preplanning.optimise.optimise_single.py
+`python -m src.preplanning.optimise.optimise_single.py`
 
 
 Results will be written to an hdf5-file (e.g. results.hdf5) and can be analysed with the provided postprocessing jupyter-Notebooks.
