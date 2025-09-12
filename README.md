@@ -1,6 +1,6 @@
 # VentilationSysOpt_Preplanning
 
-Code utilised for publication "*...*", Breuer et al.  
+Code utilised for publication "*Optimal Ventilation System via MILP: Duct Sizes, Fan Places, Air Control*", Breuer and Pelz.  
 This framework allows optimisation of ventilation systems with respect to duct sizing, fan selection/placement/operation, and volume flow controller placement/operation.  
 The framework allows to optimise variations in control strategies, duct_constraints (min/max dimensions, max velocity), and fan data. 
 
